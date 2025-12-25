@@ -74,6 +74,7 @@ response = http.get(url, ssl_context: client.ssl_context)
 ```
 
 Available instructions:
+
 - `click(selector)` - Click element
 - `wait(ms)` - Wait duration
 - `wait_for(selector)` - Wait for element
@@ -110,23 +111,23 @@ http = client.http(
 
 ## Options Reference
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `js_render` | Boolean | Enable JavaScript rendering |
-| `premium_proxy` | Boolean | Use residential proxies |
-| `proxy_country` | String | Country code (us, gb, de, etc.) |
-| `wait` | Integer/Boolean | Wait time in ms (true = 15000) |
-| `wait_for` | String | CSS selector to wait for |
-| `session_id` | Boolean/String | Session persistence |
-| `window_height` | Integer | Browser window height |
-| `window_width` | Integer | Browser window width |
-| `js_instructions` | Array/String | Browser automation |
-| `json_response` | Boolean | Return JSON instead of HTML |
-| `screenshot` | Boolean | Take screenshot |
-| `screenshot_fullpage` | Boolean | Full page screenshot |
-| `screenshot_selector` | String | Screenshot specific element |
-| `block_resources` | String | Block resources (image,media,font) |
-| `headers` | Hash | Custom HTTP headers |
+| Option                | Type            | Description                        |
+| --------------------- | --------------- | ---------------------------------- |
+| `js_render`           | Boolean         | Enable JavaScript rendering        |
+| `premium_proxy`       | Boolean         | Use residential proxies            |
+| `proxy_country`       | String          | Country code (us, gb, de, etc.)    |
+| `wait`                | Integer/Boolean | Wait time in ms (true = 15000)     |
+| `wait_for`            | String          | CSS selector to wait for           |
+| `session_id`          | Boolean/String  | Session persistence                |
+| `window_height`       | Integer         | Browser window height              |
+| `window_width`        | Integer         | Browser window width               |
+| `js_instructions`     | Array/String    | Browser automation                 |
+| `json_response`       | Boolean         | Return JSON instead of HTML        |
+| `screenshot`          | Boolean         | Take screenshot                    |
+| `screenshot_fullpage` | Boolean         | Full page screenshot               |
+| `screenshot_selector` | String          | Screenshot specific element        |
+| `block_resources`     | String          | Block resources (image,media,font) |
+| `headers`             | Hash            | Custom HTTP headers                |
 
 ## Error Handling
 
@@ -152,6 +153,7 @@ end
 ## Rails Integration
 
 The gem automatically integrates with Rails when detected:
+
 - Uses Rails.logger by default
 - Supports ActiveSupport::Duration for wait times
 
