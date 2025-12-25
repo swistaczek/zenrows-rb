@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-12-25
+
+### Added
+
+- `ApiClient` for REST API mode (autoparse, css_extractor, markdown output)
+- `CssExtractor` DSL for building extraction rules
+- `ApiResponse` wrapper with typed accessors
+- Proxy options: `device`, `antibot`, `session_ttl`
+- RBS type signatures
+- rubocop-minitest linting
+- Dependabot configuration
+
+### Changed
+
+- Require Ruby >= 3.2.0
+
 ## [0.1.0] - 2025-12-25
 
 ### Added
