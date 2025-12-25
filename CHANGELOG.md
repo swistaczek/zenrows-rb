@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-12-25
+
+### Added
+
+- Configurable `api_endpoint` for ApiClient (global config or per-instance)
+
+### Changed
+
+- SSL context now auto-configured in proxy client (no need to pass `ssl_context:` on every request)
+
 ## [0.2.0] - 2025-12-25
 
 ### Added

@@ -12,7 +12,7 @@ module Zenrows
     # @example Basic usage
     #   backend = Zenrows::Backends::HttpRb.new(proxy: proxy, config: config)
     #   http = backend.build_client(js_render: true)
-    #   response = http.get(url, ssl_context: backend.ssl_context)
+    #   response = http.get(url)  # SSL context is auto-configured
     #
     # @author Ernest Bursa
     # @since 0.1.0
@@ -41,18 +41,17 @@ module Zenrows
         # Calculate timeouts
         timeouts = calculate_timeouts(opts)
 
-        # Build HTTP client
-        client = HTTP
+        # Build HTTP client with SSL context and proxy
+        HTTP
           .timeout(connect: timeouts[:connect], read: timeouts[:read])
           .headers(headers)
-
-        # Configure proxy
-        client.via(
-          proxy_config[:host],
-          proxy_config[:port],
-          proxy_config[:username],
-          proxy_config[:password]
-        )
+          .via(
+            proxy_config[:host],
+            proxy_config[:port],
+            proxy_config[:username],
+            proxy_config[:password],
+            ssl_context: ssl_context
+          )
       end
     end
   end

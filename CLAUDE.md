@@ -46,7 +46,7 @@ end
 
 client = Zenrows::Client.new
 http = client.http(js_render: true, premium_proxy: true)
-response = http.get('https://example.com', ssl_context: client.ssl_context)
+response = http.get('https://example.com')  # SSL verification disabled for proxy
 ```
 
 ## Key Options

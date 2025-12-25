@@ -42,10 +42,14 @@ module Zenrows
     # @return [Logger, nil] Logger instance for debug output
     attr_accessor :logger
 
+    # @return [String] ZenRows API endpoint for ApiClient
+    attr_accessor :api_endpoint
+
     # Default configuration values
     DEFAULTS = {
       host: "superproxy.zenrows.com",
       port: 1337,
+      api_endpoint: "https://api.zenrows.com/v1/",
       connect_timeout: 5,
       read_timeout: 180,
       backend: :http_rb
@@ -64,6 +68,7 @@ module Zenrows
         @api_key = nil
         @host = DEFAULTS[:host]
         @port = DEFAULTS[:port]
+        @api_endpoint = DEFAULTS[:api_endpoint]
         @connect_timeout = DEFAULTS[:connect_timeout]
         @read_timeout = DEFAULTS[:read_timeout]
         @backend = DEFAULTS[:backend]
@@ -99,6 +104,7 @@ module Zenrows
         api_key: api_key,
         host: host,
         port: port,
+        api_endpoint: api_endpoint,
         connect_timeout: connect_timeout,
         read_timeout: read_timeout,
         backend: backend

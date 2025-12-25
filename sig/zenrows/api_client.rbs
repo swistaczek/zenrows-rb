@@ -1,10 +1,9 @@
 class Zenrows::ApiClient
-  API_ENDPOINT: String
-
   attr_reader api_key: String
+  attr_reader api_endpoint: String
   attr_reader config: Zenrows::Configuration
 
-  def initialize: (?api_key: String?) -> void
+  def initialize: (?api_key: String?, ?api_endpoint: String?) -> void
   def get: (String url, **untyped options) -> Zenrows::ApiResponse
   def post: (String url, ?body: String?, **untyped options) -> Zenrows::ApiResponse
 

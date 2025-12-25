@@ -13,7 +13,7 @@ module Zenrows
   #
   #   client = Zenrows::Client.new
   #   http = client.http(js_render: true)
-  #   response = http.get('https://example.com', ssl_context: client.ssl_context)
+  #   response = http.get('https://example.com')
   #
   # @example With custom configuration
   #   client = Zenrows::Client.new(api_key: 'KEY', host: 'proxy.zenrows.com')
@@ -74,11 +74,11 @@ module Zenrows
     #
     # @example Basic request
     #   http = client.http(js_render: true)
-    #   response = http.get(url, ssl_context: client.ssl_context)
+    #   response = http.get(url)
     #
     # @example With premium proxy and country
     #   http = client.http(premium_proxy: true, proxy_country: 'us')
-    #   response = http.get(url, ssl_context: client.ssl_context)
+    #   response = http.get(url)
     def http(options = {})
       backend.build_client(options)
     end
@@ -86,12 +86,10 @@ module Zenrows
     # Get SSL context for proxy connections
     #
     # ZenRows proxy requires SSL verification to be disabled.
+    # This is automatically applied when using #http, but exposed
+    # for advanced use cases.
     #
     # @return [OpenSSL::SSL::SSLContext] SSL context
-    #
-    # @example
-    #   http = client.http(js_render: true)
-    #   response = http.get(url, ssl_context: client.ssl_context)
     def ssl_context
       backend.ssl_context
     end

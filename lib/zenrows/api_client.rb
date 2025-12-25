@@ -29,10 +29,11 @@ module Zenrows
   # @since 0.2.0
   # @api public
   class ApiClient
-    API_ENDPOINT = "https://api.zenrows.com/v1/"
-
     # @return [String] ZenRows API key
     attr_reader :api_key
+
+    # @return [String] API endpoint URL
+    attr_reader :api_endpoint
 
     # @return [Configuration] Configuration instance
     attr_reader :config
@@ -40,9 +41,11 @@ module Zenrows
     # Initialize API client
     #
     # @param api_key [String, nil] Override API key (uses global config if nil)
-    def initialize(api_key: nil)
+    # @param api_endpoint [String, nil] Override API endpoint (uses global config if nil)
+    def initialize(api_key: nil, api_endpoint: nil)
       @config = Zenrows.configuration
       @api_key = api_key || @config.api_key
+      @api_endpoint = api_endpoint || @config.api_endpoint
       @config.validate! unless api_key
     end
 
@@ -74,7 +77,7 @@ module Zenrows
     # @raise [RateLimitError] if rate limited
     def get(url, **options)
       params = build_params(url, options)
-      http_response = build_http_client.get(API_ENDPOINT, params: params)
+      http_response = build_http_client.get(api_endpoint, params: params)
       handle_response(http_response, options)
     end
 
@@ -86,7 +89,7 @@ module Zenrows
     # @return [ApiResponse] Response wrapper
     def post(url, body: nil, **options)
       params = build_params(url, options)
-      http_response = build_http_client.post(API_ENDPOINT, params: params, body: body)
+      http_response = build_http_client.post(api_endpoint, params: params, body: body)
       handle_response(http_response, options)
     end
 

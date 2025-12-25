@@ -35,11 +35,13 @@ end
 ```ruby
 client = Zenrows::Client.new
 http = client.http(js_render: true, premium_proxy: true)
-response = http.get('https://example.com', ssl_context: client.ssl_context)
+response = http.get('https://example.com')
 
 puts response.body
 puts response.status
 ```
+
+> **Note:** SSL verification is disabled automatically for proxy connections (required by ZenRows).
 
 ### With Options
 
@@ -70,7 +72,7 @@ instructions = Zenrows::JsInstructions.build do
 end
 
 http = client.http(js_render: true, js_instructions: instructions)
-response = http.get(url, ssl_context: client.ssl_context)
+response = http.get(url)
 ```
 
 Available instructions:
