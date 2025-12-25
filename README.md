@@ -109,6 +109,71 @@ http = client.http(
 )
 ```
 
+### Device & Antibot
+
+```ruby
+http = client.http(
+  js_render: true,
+  device: 'mobile',      # mobile/desktop emulation
+  antibot: true          # enhanced antibot bypass
+)
+```
+
+## API Client (v0.2.0+)
+
+For advanced extraction features, use the REST API client:
+
+### Autoparse
+
+Extract structured data from known sites (Amazon, etc.):
+
+```ruby
+api = Zenrows::ApiClient.new
+response = api.get('https://amazon.com/dp/B01LD5GO7I', autoparse: true)
+
+response.parsed  # => { "title" => "...", "price" => "$29.99", ... }
+```
+
+### CSS Extraction
+
+Extract data using CSS selectors:
+
+```ruby
+# Hash syntax
+response = api.get(url, css_extractor: {
+  title: 'h1',
+  links: 'a @href',
+  prices: '.price'
+})
+response.extracted  # => { "title" => "...", "links" => [...], "prices" => [...] }
+
+# DSL syntax
+extractor = Zenrows::CssExtractor.build do
+  extract :title, 'h1'
+  links :urls, 'a.product'
+  images :photos, 'img.gallery'
+end
+response = api.get(url, css_extractor: extractor)
+```
+
+### Markdown Output
+
+```ruby
+response = api.get(url, response_type: 'markdown')
+response.markdown  # => "# Page Title\n\nContent..."
+```
+
+### Response Metadata
+
+```ruby
+response = api.get(url)
+response.status              # => 200
+response.success?            # => true
+response.final_url           # => "https://example.com/redirected"
+response.request_cost        # => 0.001
+response.concurrency_remaining  # => 199
+```
+
 ## Options Reference
 
 | Option                | Type            | Description                        |
@@ -116,9 +181,12 @@ http = client.http(
 | `js_render`           | Boolean         | Enable JavaScript rendering        |
 | `premium_proxy`       | Boolean         | Use residential proxies            |
 | `proxy_country`       | String          | Country code (us, gb, de, etc.)    |
+| `device`              | String          | Device emulation (mobile/desktop)  |
+| `antibot`             | Boolean         | Enhanced antibot bypass            |
 | `wait`                | Integer/Boolean | Wait time in ms (true = 15000)     |
 | `wait_for`            | String          | CSS selector to wait for           |
 | `session_id`          | Boolean/String  | Session persistence                |
+| `session_ttl`         | String          | Session duration (1m, 10m, 30m)    |
 | `window_height`       | Integer         | Browser window height              |
 | `window_width`        | Integer         | Browser window width               |
 | `js_instructions`     | Array/String    | Browser automation                 |
@@ -128,6 +196,15 @@ http = client.http(
 | `screenshot_selector` | String          | Screenshot specific element        |
 | `block_resources`     | String          | Block resources (image,media,font) |
 | `headers`             | Hash            | Custom HTTP headers                |
+
+### API Client Options
+
+| Option           | Type         | Description                          |
+| ---------------- | ------------ | ------------------------------------ |
+| `autoparse`      | Boolean      | Auto-extract structured data         |
+| `css_extractor`  | Hash/Object  | CSS selectors for extraction         |
+| `response_type`  | String       | Output format ('markdown')           |
+| `outputs`        | String       | Extract specific data (headings,links) |
 
 ## Error Handling
 
