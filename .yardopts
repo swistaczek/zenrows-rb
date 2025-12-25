@@ -1,0 +1,10 @@
+--markup markdown
+--charset utf-8
+--readme README.md
+--title "Zenrows Ruby Client"
+--protected
+--no-private
+lib/**/*.rb
+-
+LICENSE.txt
+CHANGELOG.md
