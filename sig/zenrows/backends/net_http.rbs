@@ -1,0 +1,28 @@
+class Zenrows::Backends::NetHttp < Zenrows::Backends::Base
+  def build_client: (?Hash[Symbol, untyped] options) -> Zenrows::Backends::NetHttpClient
+end
+
+class Zenrows::Backends::NetHttpClient
+  @proxy_config: Hash[Symbol, untyped]
+  @headers: Hash[String, String]
+  @timeouts: Hash[Symbol, Integer]
+  @ssl_context: OpenSSL::SSL::SSLContext
+
+  def initialize: (proxy_config: Hash[Symbol, untyped], headers: Hash[String, String], timeouts: Hash[Symbol, Integer], ssl_context: OpenSSL::SSL::SSLContext) -> void
+  def get: (String url, **untyped options) -> Zenrows::Backends::NetHttpResponse
+  def post: (String url, ?body: String?, **untyped options) -> Zenrows::Backends::NetHttpResponse
+
+  private
+
+  def request: (untyped uri, untyped req, Hash[Symbol, untyped] options) -> Zenrows::Backends::NetHttpResponse
+end
+
+class Zenrows::Backends::NetHttpResponse
+  attr_reader raw: untyped
+
+  def initialize: (untyped response) -> void
+  def body: () -> String?
+  def status: () -> Integer
+  def headers: () -> Hash[String, String]
+  def to_s: () -> String?
+end

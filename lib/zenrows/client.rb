@@ -146,12 +146,40 @@ module Zenrows
     # @return [Backends::Base] Backend instance
     # @raise [ConfigurationError] if backend is not supported
     def build_backend
-      case config.backend
+      backend_name = resolve_backend
+      case backend_name
       when :http_rb
         Backends::HttpRb.new(proxy: proxy, config: config)
+      when :net_http
+        Backends::NetHttp.new(proxy: proxy, config: config)
       else
-        raise ConfigurationError, "Unsupported backend: #{config.backend}. Use :http_rb"
+        raise ConfigurationError, "Unsupported backend: #{backend_name}. Use :http_rb or :net_http"
       end
+    end
+
+    # Resolve which backend to use
+    #
+    # @return [Symbol] Backend name
+    def resolve_backend
+      return config.backend if config.backend == :net_http
+
+      # Try http_rb first (preferred), fallback to net_http
+      if config.backend == :http_rb
+        return :http_rb if http_rb_available?
+        return :net_http
+      end
+
+      config.backend
+    end
+
+    # Check if http.rb gem is available
+    #
+    # @return [Boolean]
+    def http_rb_available?
+      require "http"
+      true
+    rescue LoadError
+      false
     end
   end
 end

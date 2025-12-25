@@ -6,7 +6,12 @@ require_relative "zenrows/configuration"
 require_relative "zenrows/proxy"
 require_relative "zenrows/js_instructions"
 require_relative "zenrows/backends/base"
-require_relative "zenrows/backends/http_rb"
+require_relative "zenrows/backends/net_http"
+begin
+  require_relative "zenrows/backends/http_rb"
+rescue LoadError
+  # http.rb not available, will use net_http fallback
+end
 require_relative "zenrows/client"
 require_relative "zenrows/css_extractor"
 require_relative "zenrows/api_response"
@@ -21,7 +26,7 @@ require_relative "zenrows/api_client"
 #
 #   client = Zenrows::Client.new
 #   http = client.http(js_render: true, premium_proxy: true)
-#   response = http.get('https://example.com', ssl_context: client.ssl_context)
+#   response = http.get('https://example.com')
 #
 # @example With JavaScript instructions
 #   instructions = Zenrows::JsInstructions.build do

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Configurable `api_endpoint` for ApiClient (global config or per-instance)
+- `net_http` backend as fallback when http.rb unavailable
+- GitHub Pages for YARD documentation
 
 ### Changed
 
