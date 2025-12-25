@@ -8,6 +8,9 @@ require_relative "zenrows/js_instructions"
 require_relative "zenrows/backends/base"
 require_relative "zenrows/backends/http_rb"
 require_relative "zenrows/client"
+require_relative "zenrows/css_extractor"
+require_relative "zenrows/api_response"
+require_relative "zenrows/api_client"
 
 # ZenRows Ruby client for web scraping proxy
 #

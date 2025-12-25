@@ -2,9 +2,16 @@
 require:
   - standard
 
+plugins:
+  - rubocop-minitest
+
 inherit_gem:
   standard: config/base.yml
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   NewCops: enable
+
+# Allow multiple assertions in comprehensive tests
+Minitest/MultipleAssertions:
+  Max: 6

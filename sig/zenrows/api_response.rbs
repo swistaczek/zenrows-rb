@@ -1,0 +1,28 @@
+class Zenrows::ApiResponse
+  attr_reader raw: untyped
+  attr_reader status: Integer
+  attr_reader options: Hash[Symbol, untyped]
+
+  def initialize: (untyped http_response, ?Hash[Symbol, untyped] options) -> void
+  def body: () -> String
+  def data: () -> untyped
+  def html: () -> String
+  def markdown: () -> String
+  def parsed: () -> untyped
+  def extracted: () -> untyped
+  def xhr: () -> Array[untyped]?
+  def js_instructions_report: () -> Hash[String, untyped]?
+  def screenshot: () -> String?
+  def headers: () -> Hash[String, String]
+  def concurrency_limit: () -> Integer?
+  def concurrency_remaining: () -> Integer?
+  def request_cost: () -> Float?
+  def final_url: () -> String?
+  def success?: () -> bool
+
+  private
+
+  def json_response?: () -> bool
+  def parse_body: () -> untyped
+  def looks_like_json?: () -> bool
+end

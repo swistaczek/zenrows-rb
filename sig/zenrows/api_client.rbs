@@ -1,0 +1,16 @@
+class Zenrows::ApiClient
+  API_ENDPOINT: String
+
+  attr_reader api_key: String
+  attr_reader config: Zenrows::Configuration
+
+  def initialize: (?api_key: String?) -> void
+  def get: (String url, **untyped options) -> Zenrows::ApiResponse
+  def post: (String url, ?body: String?, **untyped options) -> Zenrows::ApiResponse
+
+  private
+
+  def build_http_client: () -> untyped
+  def build_params: (String url, Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+  def handle_response: (untyped http_response, Hash[Symbol, untyped] options) -> Zenrows::ApiResponse
+end

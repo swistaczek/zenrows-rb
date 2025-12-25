@@ -1,0 +1,14 @@
+class Zenrows::CssExtractor
+  attr_reader rules: Hash[Symbol, String]
+
+  def self.build: () { (Zenrows::CssExtractor) -> void } -> Zenrows::CssExtractor
+
+  def initialize: () -> void
+  def extract: (Symbol | String name, String selector, ?attribute: String?) -> self
+  def links: (Symbol | String name, String selector) -> self
+  def images: (Symbol | String name, String selector) -> self
+  def to_h: () -> Hash[Symbol, String]
+  def to_json: (*untyped) -> String
+  def empty?: () -> bool
+  def size: () -> Integer
+end

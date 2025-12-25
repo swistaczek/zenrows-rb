@@ -17,3 +17,4 @@ gem "yard", "~> 0.9"
 
 # Linting (Standard RB = RuboCop with sensible defaults)
 gem "standard", "~> 1.51"
+gem "rubocop-minitest", "~> 0.36"

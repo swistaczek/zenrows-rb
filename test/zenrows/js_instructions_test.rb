@@ -10,7 +10,7 @@ class JsInstructionsTest < Minitest::Test
     end
 
     assert_equal 2, instructions.size
-    refute instructions.empty?
+    refute_empty instructions
   end
 
   def test_click
@@ -113,6 +113,7 @@ class JsInstructionsTest < Minitest::Test
     end
 
     json = instructions.to_json
+
     assert_equal '[{"click":".btn"},{"wait":500}]', json
   end
 

@@ -111,4 +111,43 @@ class ProxyTest < Minitest::Test
       @proxy.build(wait: 200_000)
     end
   end
+
+  def test_build_with_device_mobile
+    config = @proxy.build(device: "mobile")
+
+    assert_includes config[:password], "device=mobile"
+  end
+
+  def test_build_with_device_desktop
+    config = @proxy.build(device: :desktop)
+
+    assert_includes config[:password], "device=desktop"
+  end
+
+  def test_build_with_antibot
+    config = @proxy.build(antibot: true)
+
+    assert_includes config[:password], "antibot=true"
+  end
+
+  def test_build_with_session_ttl
+    config = @proxy.build(session_id: true, session_ttl: "30m")
+
+    assert_includes config[:password], "session_ttl=30m"
+    assert_match(/session_id=\d+/, config[:password])
+  end
+
+  def test_build_with_all_valid_session_ttl_values
+    %w[30s 5m 30m 1h 1d].each do |ttl|
+      config = @proxy.build(session_ttl: ttl)
+
+      assert_includes config[:password], "session_ttl=#{ttl}"
+    end
+  end
+
+  def test_raises_on_invalid_session_ttl
+    assert_raises ArgumentError do
+      @proxy.build(session_ttl: "invalid")
+    end
+  end
 end

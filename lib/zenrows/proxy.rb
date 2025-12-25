@@ -79,8 +79,12 @@ module Zenrows
     # @option options [String] :screenshot_selector Screenshot specific element
     # @option options [Boolean] :custom_headers Enable custom headers passthrough
     # @option options [String] :block_resources Block resources (image,media,font)
+    # @option options [String] :device Device emulation ('mobile' or 'desktop')
+    # @option options [Boolean] :antibot Enhanced antibot bypass mode
+    # @option options [String] :session_ttl Session duration ('30s', '5m', '30m', '1h', '1d')
     # @return [Hash] Proxy configuration with :host, :port, :username, :password
     # @raise [WaitTimeError] if wait time exceeds 3 minutes
+    # @raise [ArgumentError] if session_ttl is invalid
     def build(options = {})
       opts = options.dup
       proxy_params = build_params(opts)
@@ -184,6 +188,21 @@ module Zenrows
 
       # Block resources
       params[:block_resources] = opts[:block_resources] if opts[:block_resources]
+
+      # Device emulation
+      params[:device] = opts[:device].to_s if opts[:device]
+
+      # Antibot bypass
+      params[:antibot] = true if opts[:antibot]
+
+      # Session TTL (duration)
+      if opts[:session_ttl]
+        ttl = opts[:session_ttl].to_s
+        unless VALID_STICKY_TTL.include?(ttl)
+          raise ArgumentError, "Invalid session_ttl: #{ttl}. Valid values: #{VALID_STICKY_TTL.join(", ")}"
+        end
+        params[:session_ttl] = ttl
+      end
 
       # Auto-enable js_render if needed
       params[:js_render] = true if requires_js_render?(params)
