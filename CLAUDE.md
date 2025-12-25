@@ -2,11 +2,18 @@
 
 Ruby gem for ZenRows web scraping proxy. Multi-backend HTTP client (http.rb primary).
 
+## Context7 MCP
+
+Use Context7 for docs lookup:
+- `/websites/guides_rubygems` - RubyGems packaging
+- `/docs.zenrows.com-4bed007/llmstxt` - ZenRows API
+- `/websites/code_claude_en` - Claude Code CLI
+
 ## Commands
 
 ```bash
 bundle install          # Install dependencies
-bundle exec rspec       # Run tests
+bundle exec rake test   # Run tests
 bundle exec rubocop     # Lint code
 bundle exec yard doc    # Generate docs
 bundle exec rake build  # Build gem

@@ -11,13 +11,13 @@ Gem::Specification.new do |spec|
   spec.summary = "Ruby client for ZenRows web scraping API via proxy mode"
   spec.description = "A Ruby gem for ZenRows web scraping proxy with multi-backend support (http.rb primary), " \
                      "JavaScript rendering, premium proxies, and comprehensive browser automation via JS instructions."
-  spec.homepage = "https://github.com/fourthwall/zenrows"
+  spec.homepage = "https://github.com/swistaczek/zenrows-rb"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/fourthwall/zenrows"
-  spec.metadata["changelog_uri"] = "https://github.com/fourthwall/zenrows/blob/main/CHANGELOG.md"
+  spec.metadata["source_code_uri"] = "https://github.com/swistaczek/zenrows-rb"
+  spec.metadata["changelog_uri"] = "https://github.com/swistaczek/zenrows-rb/blob/main/CHANGELOG.md"
   spec.metadata["documentation_uri"] = "https://rubydoc.info/gems/zenrows"
   spec.metadata["rubygems_mfa_required"] = "true"
 
