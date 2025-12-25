@@ -1,0 +1,19 @@
+class Zenrows::Configuration
+  include MonitorMixin
+
+  DEFAULTS: Hash[Symbol, untyped]
+
+  attr_accessor api_key: String?
+  attr_accessor host: String
+  attr_accessor port: Integer
+  attr_accessor connect_timeout: Integer
+  attr_accessor read_timeout: Integer
+  attr_accessor backend: Symbol
+  attr_accessor logger: Logger?
+
+  def initialize: () -> void
+  def reset!: () -> void
+  def validate!: () -> true
+  def valid?: () -> bool
+  def to_h: () -> Hash[Symbol, untyped]
+end

@@ -1,0 +1,3 @@
+class Zenrows::Backends::HttpRb < Zenrows::Backends::Base
+  def build_client: (?Hash[Symbol, untyped] options) -> untyped
+end

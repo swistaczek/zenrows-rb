@@ -1,4 +1,7 @@
 module Zenrows
   VERSION: String
-  # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+  def self.configuration: () -> Configuration
+  def self.configure: () { (Configuration) -> void } -> Configuration
+  def self.reset_configuration!: () -> void
 end

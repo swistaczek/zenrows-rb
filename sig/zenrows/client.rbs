@@ -1,0 +1,11 @@
+class Zenrows::Client
+  attr_reader config: Zenrows::Configuration
+  attr_reader proxy: Zenrows::Proxy
+  attr_reader backend: Zenrows::Backends::Base
+
+  def initialize: (?api_key: String?, ?host: String?, ?port: Integer?, ?backend: Symbol?) -> void
+  def http: (?Hash[Symbol, untyped] options) -> untyped
+  def ssl_context: () -> OpenSSL::SSL::SSLContext
+  def proxy_config: (?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+  def proxy_url: (?Hash[Symbol, untyped] options) -> String
+end

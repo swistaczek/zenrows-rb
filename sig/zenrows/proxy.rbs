@@ -1,0 +1,14 @@
+class Zenrows::Proxy
+  MAX_WAIT_MS: Integer
+  VALID_STICKY_TTL: Array[String]
+  VALID_REGIONS: Hash[String, String]
+
+  attr_reader api_key: String
+  attr_reader host: String
+  attr_reader port: Integer
+
+  def initialize: (api_key: String, host: String, port: Integer) -> void
+  def build: (?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+  def build_url: (?Hash[Symbol, untyped] options) -> String
+  def build_array: (?Hash[Symbol, untyped] options) -> [String, Integer, String, String]
+end

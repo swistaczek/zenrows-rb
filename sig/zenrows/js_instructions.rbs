@@ -1,0 +1,28 @@
+class Zenrows::JsInstructions
+  attr_reader instructions: Array[Hash[Symbol, untyped]]
+
+  def initialize: () -> void
+  def self.build: () { (Zenrows::JsInstructions) -> void } -> Zenrows::JsInstructions
+
+  def click: (String selector) -> self
+  def wait: (Integer duration) -> self
+  def wait_for: (String selector) -> self
+  def wait_event: (String | Symbol event) -> self
+  def fill: (String selector, String value) -> self
+  def check: (String selector) -> self
+  def uncheck: (String selector) -> self
+  def select_option: (String selector, String value) -> self
+  def scroll_y: (Integer pixels) -> self
+  def scroll_x: (Integer pixels) -> self
+  def scroll_to: (String | Symbol position) -> self
+  def evaluate: (String code) -> self
+  def frame_click: (String iframe_selector, String element_selector) -> self
+  def frame_wait_for: (String iframe_selector, String element_selector) -> self
+  def frame_fill: (String iframe_selector, String input_selector, String value) -> self
+  def frame_evaluate: (String iframe_name, String code) -> self
+
+  def to_json: (*untyped) -> String
+  def to_a: () -> Array[Hash[Symbol, untyped]]
+  def empty?: () -> bool
+  def size: () -> Integer
+end

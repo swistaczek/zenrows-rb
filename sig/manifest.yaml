@@ -1,0 +1,5 @@
+dependencies:
+  - name: logger
+  - name: openssl
+  - name: monitor
+  - name: json

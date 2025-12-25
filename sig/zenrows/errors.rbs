@@ -1,0 +1,27 @@
+class Zenrows::Error < StandardError
+end
+
+class Zenrows::ConfigurationError < Zenrows::Error
+end
+
+class Zenrows::AuthenticationError < Zenrows::Error
+end
+
+class Zenrows::RateLimitError < Zenrows::Error
+  attr_reader retry_after: Integer?
+  def initialize: (?String message, ?retry_after: Integer?) -> void
+end
+
+class Zenrows::BotDetectedError < Zenrows::Error
+  attr_reader suggestion: String?
+  def initialize: (?String message, ?suggestion: String?) -> void
+end
+
+class Zenrows::TimeoutError < Zenrows::Error
+end
+
+class Zenrows::ProxyError < Zenrows::Error
+end
+
+class Zenrows::WaitTimeError < Zenrows::Error
+end

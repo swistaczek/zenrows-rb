@@ -1,0 +1,9 @@
+class Zenrows::Backends::Base
+  attr_reader proxy: Zenrows::Proxy
+  attr_reader config: Zenrows::Configuration
+
+  def initialize: (proxy: Zenrows::Proxy, config: Zenrows::Configuration) -> void
+  def build_client: (?Hash[Symbol, untyped] options) -> untyped
+  def ssl_context: () -> OpenSSL::SSL::SSLContext
+  def calculate_timeouts: (?Hash[Symbol, untyped] options) -> Hash[Symbol, Integer]
+end
