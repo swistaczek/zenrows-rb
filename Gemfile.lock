@@ -52,7 +52,8 @@ GEM
     llhttp-ffi (0.5.1)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
-    minitest (5.27.0)
+    minitest (6.0.0)
+      prism (~> 1.5)
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -138,7 +139,7 @@ PLATFORMS
 
 DEPENDENCIES
   irb
-  minitest (~> 5.0)
+  minitest (~> 6.0)
   rake (~> 13.0)
   rubocop-minitest (~> 0.36)
   standard (~> 1.51)
