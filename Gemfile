@@ -8,7 +8,7 @@ gem "irb"
 gem "rake", "~> 13.0"
 
 # Testing
-gem "minitest", "~> 5.0"
+gem "minitest", "~> 6.0"
 gem "vcr", "~> 6.0"
 gem "webmock", "~> 3.0"
 
