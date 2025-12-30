@@ -208,6 +208,46 @@ response.concurrency_remaining  # => 199
 | `response_type`  | String       | Output format ('markdown')           |
 | `outputs`        | String       | Extract specific data (headings,links) |
 
+## Hooks
+
+Register callbacks for request lifecycle events:
+
+```ruby
+Zenrows.configure do |c|
+  c.api_key = 'YOUR_KEY'
+
+  # Log responses
+  c.on_response { |resp, ctx| puts "#{ctx[:host]} -> #{resp.status}" }
+
+  # Track errors
+  c.on_error { |err, ctx| Sentry.capture_exception(err) }
+
+  # Monitor costs
+  c.on_response do |resp, ctx|
+    cost = ctx[:zenrows_headers][:request_cost]
+    StatsD.increment('zenrows.cost', cost) if cost
+  end
+end
+```
+
+Per-client hooks:
+
+```ruby
+client = Zenrows::Client.new do |c|
+  c.on_response { |resp, ctx| log_specific(resp) }
+end
+```
+
+Built-in logger:
+
+```ruby
+c.add_subscriber(Zenrows::Hooks::LogSubscriber.new)
+```
+
+Available hooks: `before_request`, `after_request`, `on_response`, `on_error`, `around_request`
+
+Context includes: `method`, `url`, `host`, `duration`, `zenrows_headers` (request_cost, concurrency_remaining, request_id, final_url)
+
 ## Error Handling
 
 ```ruby

@@ -25,6 +25,11 @@ module Zenrows
   # @example With markdown output
   #   response = api.get(url, response_type: 'markdown')
   #
+  # @example With per-client hooks
+  #   api = Zenrows::ApiClient.new do |c|
+  #     c.on_response { |resp, ctx| puts "#{ctx[:host]} -> #{resp.status}" }
+  #   end
+  #
   # @author Ernest Bursa
   # @since 0.2.0
   # @api public
@@ -38,15 +43,23 @@ module Zenrows
     # @return [Configuration] Configuration instance
     attr_reader :config
 
+    # @return [Hooks] Hook registry for this client
+    attr_reader :hooks
+
     # Initialize API client
     #
     # @param api_key [String, nil] Override API key (uses global config if nil)
     # @param api_endpoint [String, nil] Override API endpoint (uses global config if nil)
-    def initialize(api_key: nil, api_endpoint: nil)
+    # @yield [config] Optional block for per-client configuration (hooks)
+    # @yieldparam config [HookConfigurator] Hook configuration DSL
+    def initialize(api_key: nil, api_endpoint: nil, &block)
       @config = Zenrows.configuration
       @api_key = api_key || @config.api_key
       @api_endpoint = api_endpoint || @config.api_endpoint
       @config.validate! unless api_key
+
+      # Build hooks: start with global, allow per-client additions
+      @hooks = block ? build_hooks(&block) : Zenrows.configuration.hooks.dup
     end
 
     # Make GET request through ZenRows API
@@ -76,9 +89,11 @@ module Zenrows
     # @raise [AuthenticationError] if API key invalid
     # @raise [RateLimitError] if rate limited
     def get(url, **options)
-      params = build_params(url, options)
-      http_response = build_http_client.get(api_endpoint, params: params)
-      handle_response(http_response, options)
+      instrument(:get, url, options) do
+        params = build_params(url, options)
+        http_response = build_http_client.get(api_endpoint, params: params)
+        handle_response(http_response, options)
+      end
     end
 
     # Make POST request through ZenRows API
@@ -88,12 +103,60 @@ module Zenrows
     # @param options [Hash] Request options (same as #get)
     # @return [ApiResponse] Response wrapper
     def post(url, body: nil, **options)
-      params = build_params(url, options)
-      http_response = build_http_client.post(api_endpoint, params: params, body: body)
-      handle_response(http_response, options)
+      instrument(:post, url, options) do
+        params = build_params(url, options)
+        http_response = build_http_client.post(api_endpoint, params: params, body: body)
+        handle_response(http_response, options)
+      end
     end
 
     private
+
+    # Build hooks registry for this client
+    #
+    # @yield [config] Block for registering per-client hooks
+    # @return [Hooks] Combined hooks registry
+    def build_hooks
+      client_hooks = Zenrows.configuration.hooks.dup
+      hook_config = HookConfigurator.new(client_hooks)
+      yield(hook_config)
+      client_hooks
+    end
+
+    # Instrument a request with hooks
+    #
+    # @param method [Symbol] HTTP method
+    # @param url [String] Target URL
+    # @param options [Hash] Request options
+    # @yield Block that executes the actual request
+    # @return [Object] Response from block
+    def instrument(method, url, options)
+      return yield if hooks.empty?
+
+      context = Hooks::Context.for_request(
+        method: method,
+        url: url,
+        options: options,
+        backend: :api
+      )
+
+      hooks.run(:before_request, context)
+
+      response = hooks.run_around(context) do
+        result = yield
+        Hooks::Context.enrich_with_response(context, result)
+        hooks.run(:on_response, result, context)
+        result
+      end
+
+      response
+    rescue => e
+      context[:error] = e if context
+      hooks.run(:on_error, e, context) if context
+      raise
+    ensure
+      hooks.run(:after_request, context) if context
+    end
 
     def build_http_client
       HTTP

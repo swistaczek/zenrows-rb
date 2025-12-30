@@ -23,7 +23,7 @@ module Zenrows
       # Build a configured HTTP client wrapper
       #
       # @param options [Hash] Request options
-      # @return [NetHttpClient] Configured client wrapper
+      # @return [NetHttpClient, InstrumentedClient] Configured client wrapper (instrumented if hooks registered)
       def build_client(options = {})
         opts = options.dup
         headers = opts.delete(:headers) || {}
@@ -32,12 +32,20 @@ module Zenrows
         proxy_config = proxy.build(opts)
         timeouts = calculate_timeouts(opts)
 
-        NetHttpClient.new(
+        client = NetHttpClient.new(
           proxy_config: proxy_config,
           headers: headers,
           timeouts: timeouts,
           ssl_context: ssl_context
         )
+
+        # Wrap with instrumentation if hooks registered
+        wrap_client(client, opts)
+      end
+
+      # @return [Symbol] Backend identifier
+      def backend_name
+        :net_http
       end
     end
 

@@ -19,6 +19,11 @@ module Zenrows
   #   client = Zenrows::Client.new(api_key: 'KEY', host: 'proxy.zenrows.com')
   #   http = client.http(premium_proxy: true, proxy_country: 'us')
   #
+  # @example With per-client hooks
+  #   client = Zenrows::Client.new do |c|
+  #     c.on_response { |resp, ctx| puts "#{ctx[:host]} -> #{resp.status}" }
+  #   end
+  #
   # @author Ernest Bursa
   # @since 0.1.0
   # @api public
@@ -32,16 +37,29 @@ module Zenrows
     # @return [Backends::Base] HTTP backend instance
     attr_reader :backend
 
+    # @return [Hooks] Hook registry for this client
+    attr_reader :hooks
+
     # Initialize a new client
     #
     # @param api_key [String, nil] Override API key from global config
     # @param host [String, nil] Override proxy host
     # @param port [Integer, nil] Override proxy port
     # @param backend [Symbol] Backend to use (:http_rb)
+    # @yield [config] Optional block for per-client configuration (hooks, etc.)
+    # @yieldparam config [Configuration] Client configuration for hook registration
     # @raise [ConfigurationError] if api_key is not configured
-    def initialize(api_key: nil, host: nil, port: nil, backend: nil)
+    #
+    # @example With per-client hooks
+    #   client = Zenrows::Client.new do |c|
+    #     c.on_response { |resp, ctx| puts resp.status }
+    #   end
+    def initialize(api_key: nil, host: nil, port: nil, backend: nil, &block)
       @config = build_config(api_key: api_key, host: host, port: port, backend: backend)
       @config.validate!
+
+      # Build hooks: start with global, allow per-client additions
+      @hooks = block ? build_hooks(&block) : Zenrows.configuration.hooks.dup
 
       @proxy = Proxy.new(
         api_key: @config.api_key,
@@ -149,12 +167,29 @@ module Zenrows
       backend_name = resolve_backend
       case backend_name
       when :http_rb
-        Backends::HttpRb.new(proxy: proxy, config: config)
+        Backends::HttpRb.new(proxy: proxy, config: config, hooks: hooks)
       when :net_http
-        Backends::NetHttp.new(proxy: proxy, config: config)
+        Backends::NetHttp.new(proxy: proxy, config: config, hooks: hooks)
       else
         raise ConfigurationError, "Unsupported backend: #{backend_name}. Use :http_rb or :net_http"
       end
+    end
+
+    # Build hooks registry for this client
+    #
+    # Starts with global hooks, then applies per-client hooks from block.
+    #
+    # @yield [config] Block for registering per-client hooks
+    # @return [Hooks] Combined hooks registry
+    def build_hooks
+      # Start with a copy of global hooks
+      client_hooks = Zenrows.configuration.hooks.dup
+
+      # Create a temporary config-like object for hook registration
+      hook_config = HookConfigurator.new(client_hooks)
+      yield(hook_config)
+
+      client_hooks
     end
 
     # Resolve which backend to use
@@ -180,6 +215,54 @@ module Zenrows
       true
     rescue LoadError
       false
+    end
+  end
+
+  # Helper class for per-client hook configuration
+  #
+  # Provides the same hook registration DSL as Configuration.
+  #
+  # @api private
+  class HookConfigurator
+    # @param hooks [Hooks] Hook registry to configure
+    def initialize(hooks)
+      @hooks = hooks
+    end
+
+    # Register a before_request callback
+    def before_request(callable = nil, &block)
+      @hooks.register(:before_request, callable, &block)
+      self
+    end
+
+    # Register an after_request callback
+    def after_request(callable = nil, &block)
+      @hooks.register(:after_request, callable, &block)
+      self
+    end
+
+    # Register an on_response callback
+    def on_response(callable = nil, &block)
+      @hooks.register(:on_response, callable, &block)
+      self
+    end
+
+    # Register an on_error callback
+    def on_error(callable = nil, &block)
+      @hooks.register(:on_error, callable, &block)
+      self
+    end
+
+    # Register an around_request callback
+    def around_request(callable = nil, &block)
+      @hooks.register(:around_request, callable, &block)
+      self
+    end
+
+    # Add a subscriber object
+    def add_subscriber(subscriber)
+      @hooks.add_subscriber(subscriber)
+      self
     end
   end
 end

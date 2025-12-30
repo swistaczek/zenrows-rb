@@ -18,11 +18,16 @@ module Zenrows
       # @return [Zenrows::Configuration] Configuration instance
       attr_reader :config
 
+      # @return [Zenrows::Hooks] Hook registry for this backend
+      attr_reader :hooks
+
       # @param proxy [Zenrows::Proxy] Proxy configuration builder
       # @param config [Zenrows::Configuration] Configuration instance
-      def initialize(proxy:, config:)
+      # @param hooks [Zenrows::Hooks, nil] Optional hook registry (defaults to config.hooks)
+      def initialize(proxy:, config:, hooks: nil)
         @proxy = proxy
         @config = config
+        @hooks = hooks || config.hooks&.dup || Hooks.new
       end
 
       # Build a configured HTTP client
@@ -72,6 +77,31 @@ module Zenrows
         end
 
         {connect: connect, read: read}
+      end
+
+      # Wrap HTTP client with instrumentation if hooks are registered
+      #
+      # @param client [Object] The underlying HTTP client
+      # @param options [Hash] Request options used for this client
+      # @return [Object] Instrumented client or original if no hooks
+      def wrap_client(client, options)
+        return client if hooks.empty?
+
+        InstrumentedClient.new(
+          client,
+          hooks: hooks,
+          context_base: {
+            options: options,
+            backend: backend_name
+          }
+        )
+      end
+
+      # Get the backend name for context
+      #
+      # @return [Symbol] Backend identifier
+      def backend_name
+        :base
       end
 
       private

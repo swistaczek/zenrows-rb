@@ -27,7 +27,7 @@ module Zenrows
       # @option options [Boolean, Integer] :wait Wait time
       # @option options [String] :wait_for CSS selector to wait for
       # @option options [Hash] :headers Custom HTTP headers
-      # @return [HTTP::Client] Configured HTTP client
+      # @return [HTTP::Client, InstrumentedClient] Configured HTTP client (instrumented if hooks registered)
       def build_client(options = {})
         opts = options.dup
         headers = opts.delete(:headers) || {}
@@ -42,7 +42,7 @@ module Zenrows
         timeouts = calculate_timeouts(opts)
 
         # Build HTTP client with SSL context and proxy
-        HTTP
+        client = HTTP
           .timeout(connect: timeouts[:connect], read: timeouts[:read])
           .headers(headers)
           .via(
@@ -52,6 +52,14 @@ module Zenrows
             proxy_config[:password],
             ssl_context: ssl_context
           )
+
+        # Wrap with instrumentation if hooks registered
+        wrap_client(client, opts)
+      end
+
+      # @return [Symbol] Backend identifier
+      def backend_name
+        :http_rb
       end
     end
   end

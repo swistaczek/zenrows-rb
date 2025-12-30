@@ -45,6 +45,9 @@ module Zenrows
     # @return [String] ZenRows API endpoint for ApiClient
     attr_accessor :api_endpoint
 
+    # @return [Zenrows::Hooks] Hook registry for request lifecycle events
+    attr_reader :hooks
+
     # Default configuration values
     DEFAULTS = {
       host: "superproxy.zenrows.com",
@@ -73,7 +76,115 @@ module Zenrows
         @read_timeout = DEFAULTS[:read_timeout]
         @backend = DEFAULTS[:backend]
         @logger = nil
+        @hooks = Hooks.new
       end
+    end
+
+    # Register a callback to run before each request
+    #
+    # @param callable [#call, nil] Callable object
+    # @yield [context] Block to execute
+    # @yieldparam context [Hash] Request context
+    # @return [self]
+    #
+    # @example
+    #   config.before_request { |ctx| puts "Starting: #{ctx[:url]}" }
+    def before_request(callable = nil, &block)
+      hooks.register(:before_request, callable, &block)
+      self
+    end
+
+    # Register a callback to run after each request (always runs)
+    #
+    # @param callable [#call, nil] Callable object
+    # @yield [context] Block to execute
+    # @yieldparam context [Hash] Request context
+    # @return [self]
+    #
+    # @example
+    #   config.after_request { |ctx| puts "Finished: #{ctx[:duration]}s" }
+    def after_request(callable = nil, &block)
+      hooks.register(:after_request, callable, &block)
+      self
+    end
+
+    # Register a callback to run on successful response
+    #
+    # @param callable [#call, nil] Callable object
+    # @yield [response, context] Block to execute
+    # @yieldparam response [Object] HTTP response
+    # @yieldparam context [Hash] Request context with ZenRows headers
+    # @return [self]
+    #
+    # @example Log by host
+    #   config.on_response { |resp, ctx| puts "#{ctx[:host]} -> #{resp.status}" }
+    #
+    # @example Track costs
+    #   config.on_response do |resp, ctx|
+    #     cost = ctx[:zenrows_headers][:request_cost]
+    #     StatsD.increment('zenrows.cost', cost) if cost
+    #   end
+    def on_response(callable = nil, &block)
+      hooks.register(:on_response, callable, &block)
+      self
+    end
+
+    # Register a callback to run on request error
+    #
+    # @param callable [#call, nil] Callable object
+    # @yield [error, context] Block to execute
+    # @yieldparam error [Exception] The error that occurred
+    # @yieldparam context [Hash] Request context
+    # @return [self]
+    #
+    # @example
+    #   config.on_error { |err, ctx| Sentry.capture_exception(err) }
+    def on_error(callable = nil, &block)
+      hooks.register(:on_error, callable, &block)
+      self
+    end
+
+    # Register a callback to wrap around requests
+    #
+    # Around callbacks can modify timing, add retries, etc.
+    # The block MUST call the passed block and return its result.
+    #
+    # @param callable [#call, nil] Callable object
+    # @yield [context, &block] Block to execute
+    # @yieldparam context [Hash] Request context
+    # @yieldparam block [Proc] Block to call to execute the request
+    # @return [self]
+    #
+    # @example Timing
+    #   config.around_request do |ctx, &block|
+    #     start = Time.now
+    #     response = block.call
+    #     puts "Request took #{Time.now - start}s"
+    #     response
+    #   end
+    def around_request(callable = nil, &block)
+      hooks.register(:around_request, callable, &block)
+      self
+    end
+
+    # Add a subscriber object for hook events
+    #
+    # Subscribers can implement any of: before_request, after_request,
+    # on_response, on_error, around_request.
+    #
+    # @param subscriber [Object] Object responding to hook methods
+    # @return [self]
+    #
+    # @example
+    #   class MySubscriber
+    #     def on_response(response, context)
+    #       puts response.status
+    #     end
+    #   end
+    #   config.add_subscriber(MySubscriber.new)
+    def add_subscriber(subscriber)
+      hooks.add_subscriber(subscriber)
+      self
     end
 
     # Validate that required configuration is present

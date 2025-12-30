@@ -2,9 +2,13 @@
 
 require_relative "zenrows/version"
 require_relative "zenrows/errors"
+require_relative "zenrows/hooks"
+require_relative "zenrows/hooks/context"
+require_relative "zenrows/hooks/log_subscriber"
 require_relative "zenrows/configuration"
 require_relative "zenrows/proxy"
 require_relative "zenrows/js_instructions"
+require_relative "zenrows/instrumented_client"
 require_relative "zenrows/backends/base"
 require_relative "zenrows/backends/net_http"
 begin
