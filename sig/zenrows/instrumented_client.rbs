@@ -1,0 +1,22 @@
+class Zenrows::InstrumentedClient
+  HTTP_METHODS: Array[Symbol]
+
+  attr_reader http: untyped
+  attr_reader hooks: Zenrows::Hooks
+  attr_reader context_base: Hash[Symbol, untyped]
+
+  def initialize: (untyped http, hooks: Zenrows::Hooks, context_base: Hash[Symbol, untyped]) -> void
+  def get: (String url, **untyped options) -> untyped
+  def post: (String url, **untyped options) -> untyped
+  def put: (String url, **untyped options) -> untyped
+  def patch: (String url, **untyped options) -> untyped
+  def delete: (String url, **untyped options) -> untyped
+  def head: (String url, **untyped options) -> untyped
+  def options: (String url, **untyped options) -> untyped
+
+  private
+
+  def instrument: (Symbol method, String url, Hash[Symbol, untyped] options) { () -> untyped } -> untyped
+  def build_context: (Symbol method, String url, Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+  def execute_request: (Hash[Symbol, untyped] context) { () -> untyped } -> untyped
+end

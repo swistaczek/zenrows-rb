@@ -11,10 +11,19 @@ class Zenrows::Configuration
   attr_accessor read_timeout: Integer
   attr_accessor backend: Symbol
   attr_accessor logger: Logger?
+  attr_reader hooks: Zenrows::Hooks
 
   def initialize: () -> void
   def reset!: () -> void
   def validate!: () -> true
   def valid?: () -> bool
   def to_h: () -> Hash[Symbol, untyped]
+
+  # Hook registration methods
+  def before_request: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def after_request: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def on_response: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def on_error: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def around_request: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def add_subscriber: (untyped subscriber) -> self
 end

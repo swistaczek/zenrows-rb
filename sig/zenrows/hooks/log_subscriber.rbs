@@ -1,0 +1,15 @@
+class Zenrows::Hooks::LogSubscriber
+  attr_reader logger: Logger?
+
+  def initialize: (?logger: Logger?) -> void
+  def before_request: (Hash[Symbol, untyped] context) -> void
+  def on_response: (untyped response, Hash[Symbol, untyped] context) -> void
+  def on_error: (Exception error, Hash[Symbol, untyped] context) -> void
+
+  private
+
+  def effective_logger: () -> Logger?
+  def log: (Symbol level) { () -> String } -> void
+  def extract_status: (untyped response) -> (Integer | String)
+  def format_duration: (Float? duration) -> String?
+end

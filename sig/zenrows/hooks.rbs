@@ -1,0 +1,23 @@
+class Zenrows::Hooks
+  include MonitorMixin
+
+  EVENTS: Array[Symbol]
+
+  def initialize: () -> void
+  def register: (Symbol event, ?_Callable? callable) ?{ (*untyped) -> untyped } -> self
+  def add_subscriber: (untyped subscriber) -> self
+  def run: (Symbol event, *untyped args) -> void
+  def run_around: (Hash[Symbol, untyped] context) { () -> untyped } -> untyped
+  def empty?: () -> bool
+  def merge: (Zenrows::Hooks? other) -> self
+  def dup: () -> Zenrows::Hooks
+
+  private
+
+  def validate_event!: (Symbol event) -> void
+  def execute_chain: (Array[untyped] chain, Hash[Symbol, untyped] context) { () -> untyped } -> untyped
+
+  interface _Callable
+    def call: (*untyped) -> untyped
+  end
+end

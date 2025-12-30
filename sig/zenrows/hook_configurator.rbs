@@ -1,0 +1,9 @@
+class Zenrows::HookConfigurator
+  def initialize: (Zenrows::Hooks hooks) -> void
+  def before_request: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def after_request: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def on_response: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def on_error: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def around_request: (?untyped? callable) ?{ (*untyped) -> untyped } -> self
+  def add_subscriber: (untyped subscriber) -> self
+end

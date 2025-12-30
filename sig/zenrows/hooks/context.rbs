@@ -1,0 +1,6 @@
+class Zenrows::Hooks::Context
+  ZENROWS_HEADERS: Hash[String, Symbol]
+
+  def self.for_request: (method: Symbol, url: String, options: Hash[Symbol, untyped], backend: Symbol) -> Hash[Symbol, untyped]
+  def self.enrich_with_response: (Hash[Symbol, untyped] context, untyped response) -> Hash[Symbol, untyped]
+end
