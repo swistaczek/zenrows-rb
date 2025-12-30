@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-12-30
+
+### Added
+
+- Hooks/callbacks system for request lifecycle events
+- Five hook types: `before_request`, `after_request`, `on_response`, `on_error`, `around_request`
+- Global and per-client hook registration
+- `Zenrows::Hooks::LogSubscriber` built-in logging subscriber
+- `InstrumentedClient` wrapper for HTTP client instrumentation
+- Context object with ZenRows header parsing (request_cost, concurrency_remaining, request_id, final_url)
+- RBS type signatures for all hooks classes
+- Monotonic clock for accurate request duration timing
+
+### Changed
+
+- `after_request` hook now always runs (via `ensure`), even on errors
+
 ## [0.2.1] - 2025-12-25
 
 ### Added
