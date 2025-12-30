@@ -16,8 +16,18 @@ class HooksContextTest < Minitest::Test
     assert_equal "example.com", context[:host]
     assert_equal({js_render: true}, context[:options])
     assert_equal :http_rb, context[:backend]
+  end
+
+  def test_for_request_initializes_timing_and_headers
+    context = Zenrows::Hooks::Context.for_request(
+      method: :get,
+      url: "https://example.com",
+      options: {},
+      backend: :http_rb
+    )
+
     assert_instance_of Float, context[:started_at]
-    assert_equal({}, context[:zenrows_headers])
+    assert_empty(context[:zenrows_headers])
   end
 
   def test_for_request_with_invalid_url
@@ -40,9 +50,9 @@ class HooksContextTest < Minitest::Test
       backend: :http_rb
     )
 
-    assert context[:options].frozen?
+    assert_predicate context[:options], :frozen?
     # Original should not be frozen
-    refute options.frozen?
+    refute_predicate options, :frozen?
   end
 
   def test_enrich_with_response_parses_zenrows_headers
@@ -65,9 +75,23 @@ class HooksContextTest < Minitest::Test
 
     assert_equal 25, context[:zenrows_headers][:concurrency_limit]
     assert_equal 23, context[:zenrows_headers][:concurrency_remaining]
-    assert_equal 5.5, context[:zenrows_headers][:request_cost]
+    assert_in_delta(5.5, context[:zenrows_headers][:request_cost])
     assert_equal "abc123", context[:zenrows_headers][:request_id]
     assert_equal "https://example.com/final", context[:zenrows_headers][:final_url]
+  end
+
+  def test_enrich_with_response_sets_timing
+    context = Zenrows::Hooks::Context.for_request(
+      method: :get,
+      url: "https://example.com",
+      options: {},
+      backend: :http_rb
+    )
+
+    response = MockResponse.new(200, {})
+
+    Zenrows::Hooks::Context.enrich_with_response(context, response)
+
     assert_instance_of Float, context[:completed_at]
     assert_instance_of Float, context[:duration]
   end
@@ -84,7 +108,7 @@ class HooksContextTest < Minitest::Test
 
     Zenrows::Hooks::Context.enrich_with_response(context, response)
 
-    assert_equal({}, context[:zenrows_headers])
+    assert_empty(context[:zenrows_headers])
   end
 
   def test_enrich_with_response_handles_lowercase_headers
@@ -103,7 +127,7 @@ class HooksContextTest < Minitest::Test
     Zenrows::Hooks::Context.enrich_with_response(context, response)
 
     assert_equal 10, context[:zenrows_headers][:concurrency_limit]
-    assert_equal 2.0, context[:zenrows_headers][:request_cost]
+    assert_in_delta(2.0, context[:zenrows_headers][:request_cost])
   end
 
   def test_enrich_calculates_duration
@@ -120,7 +144,7 @@ class HooksContextTest < Minitest::Test
 
     Zenrows::Hooks::Context.enrich_with_response(context, response)
 
-    assert context[:duration] >= 0.01
-    assert context[:completed_at] > context[:started_at]
+    assert_operator context[:duration], :>=, 0.01
+    assert_operator context[:completed_at], :>, context[:started_at]
   end
 end

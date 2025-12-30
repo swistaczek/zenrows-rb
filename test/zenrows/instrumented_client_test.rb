@@ -130,7 +130,8 @@ class InstrumentedClientTest < Minitest::Test
 
   def test_respond_to_missing
     client = Zenrows::InstrumentedClient.new(@mock_http, hooks: @hooks, context_base: @context_base)
-    assert client.respond_to?(:custom_method)
+
+    assert_respond_to client, :custom_method
   end
 
   def test_context_includes_zenrows_headers
@@ -147,6 +148,6 @@ class InstrumentedClientTest < Minitest::Test
     client.get("https://example.com")
 
     assert_equal 25, received_headers[:concurrency_limit]
-    assert_equal 5.0, received_headers[:request_cost]
+    assert_in_delta(5.0, received_headers[:request_cost])
   end
 end

@@ -21,28 +21,29 @@ class ClientHooksTest < Minitest::Test
     end
 
     client = Zenrows::Client.new
-    refute client.hooks.empty?
+
+    refute_empty client.hooks
   end
 
   def test_client_with_per_client_hooks
     client = Zenrows::Client.new do |c|
-      c.on_response { }
+      c.on_response {}
     end
 
-    refute client.hooks.empty?
+    refute_empty client.hooks
   end
 
   def test_per_client_hooks_dont_modify_global
     global_empty_before = Zenrows.configuration.hooks.empty?
 
     Zenrows.configure do |c|
-      c.on_response { }
+      c.on_response {}
     end
 
     global_not_empty = !Zenrows.configuration.hooks.empty?
 
     client = Zenrows::Client.new do |c|
-      c.on_error { }
+      c.on_error {}
     end
 
     # Global hooks should still have same state
@@ -51,7 +52,7 @@ class ClientHooksTest < Minitest::Test
     assert global_empty_before
     assert global_not_empty
     assert global_still_not_empty
-    refute client.hooks.empty?
+    refute_empty client.hooks
   end
 
   def test_multiple_clients_have_independent_hooks
@@ -69,7 +70,7 @@ class ClientHooksTest < Minitest::Test
 
   def test_http_returns_instrumented_client_when_hooks_present
     client = Zenrows::Client.new do |c|
-      c.on_response { }
+      c.on_response {}
     end
 
     http = client.http(js_render: true)
@@ -91,14 +92,14 @@ class ClientHooksTest < Minitest::Test
   def test_per_client_hook_configurator_methods
     # Test all DSL methods are available
     client = Zenrows::Client.new do |c|
-      c.before_request { }
-      c.after_request { }
-      c.on_response { }
-      c.on_error { }
+      c.before_request {}
+      c.after_request {}
+      c.on_response {}
+      c.on_error {}
       c.around_request { |ctx, &block| block.call }
       c.add_subscriber(Object.new)
     end
 
-    refute client.hooks.empty?
+    refute_empty client.hooks
   end
 end

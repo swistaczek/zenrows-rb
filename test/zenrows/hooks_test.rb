@@ -12,6 +12,7 @@ class HooksTest < Minitest::Test
     @hooks.register(:on_response) { called = true }
 
     @hooks.run(:on_response, nil, {})
+
     assert called
   end
 
@@ -21,12 +22,13 @@ class HooksTest < Minitest::Test
     @hooks.register(:on_response, callable)
 
     @hooks.run(:on_response, nil, {})
+
     assert called
   end
 
   def test_register_raises_on_invalid_event
     assert_raises ArgumentError do
-      @hooks.register(:invalid_event) { }
+      @hooks.register(:invalid_event) {}
     end
   end
 
@@ -48,6 +50,7 @@ class HooksTest < Minitest::Test
     @hooks.register(:on_response) { results << 2 }
 
     @hooks.run(:on_response, nil, {})
+
     assert_equal [1, 2], results
   end
 
@@ -56,6 +59,7 @@ class HooksTest < Minitest::Test
     def subscriber.on_response(resp, ctx)
       @called = true
     end
+
     def subscriber.called?
       @called
     end
@@ -63,7 +67,7 @@ class HooksTest < Minitest::Test
     @hooks.add_subscriber(subscriber)
     @hooks.run(:on_response, nil, {})
 
-    assert subscriber.called?
+    assert_predicate subscriber, :called?
   end
 
   def test_subscriber_with_multiple_methods
@@ -72,9 +76,11 @@ class HooksTest < Minitest::Test
     def subscriber.before_request(ctx)
       @calls << :before
     end
+
     def subscriber.on_response(resp, ctx)
       @calls << :response
     end
+
     def subscriber.calls
       @calls
     end
@@ -87,28 +93,30 @@ class HooksTest < Minitest::Test
   end
 
   def test_empty_when_no_hooks
-    assert @hooks.empty?
+    assert_empty @hooks
   end
 
   def test_not_empty_after_register
-    @hooks.register(:on_response) { }
-    refute @hooks.empty?
+    @hooks.register(:on_response) {}
+
+    refute_empty @hooks
   end
 
   def test_not_empty_after_add_subscriber
     @hooks.add_subscriber(Object.new)
-    refute @hooks.empty?
+
+    refute_empty @hooks
   end
 
   def test_dup_creates_independent_copy
-    @hooks.register(:on_response) { }
+    @hooks.register(:on_response) {}
 
     copy = @hooks.dup
-    copy.register(:on_error) { }
+    copy.register(:on_error) {}
 
     # Original should not have on_error
-    refute @hooks.empty?
-    refute copy.empty?
+    refute_empty @hooks
+    refute_empty copy
   end
 
   def test_merge_combines_hooks
@@ -125,9 +133,10 @@ class HooksTest < Minitest::Test
   end
 
   def test_merge_with_nil_is_noop
-    @hooks.register(:on_response) { }
+    @hooks.register(:on_response) {}
     @hooks.merge(nil)
-    refute @hooks.empty?
+
+    refute_empty @hooks
   end
 
   def test_around_request_wraps_block
@@ -176,12 +185,13 @@ class HooksTest < Minitest::Test
 
   def test_run_around_without_hooks
     result = @hooks.run_around({}) { :result }
+
     assert_equal :result, result
   end
 
   def test_valid_events
     assert_equal [:before_request, :after_request, :on_response, :on_error, :around_request],
-                 Zenrows::Hooks::EVENTS
+      Zenrows::Hooks::EVENTS
   end
 
   def test_run_passes_arguments_to_callbacks
@@ -194,10 +204,12 @@ class HooksTest < Minitest::Test
   end
 
   def test_returns_self_for_chaining
-    result = @hooks.register(:on_response) { }
+    result = @hooks.register(:on_response) {}
+
     assert_same @hooks, result
 
     result = @hooks.add_subscriber(Object.new)
+
     assert_same @hooks, result
   end
 end
