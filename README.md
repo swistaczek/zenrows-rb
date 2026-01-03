@@ -121,6 +121,17 @@ http = client.http(
 )
 ```
 
+### Adaptive Stealth Mode (v0.4.0+)
+
+Let ZenRows automatically select optimal configurations:
+
+```ruby
+http = client.http(mode: "auto")
+response = http.get(url)
+```
+
+When `mode: "auto"` is enabled, ZenRows auto-manages `js_render` and `premium_proxy` using a progressive strategy - starting with the cheapest viable config and escalating only when needed. You only pay for the successful configuration.
+
 ## API Client (v0.2.0+)
 
 For advanced extraction features, use the REST API client:
@@ -180,6 +191,7 @@ response.concurrency_remaining  # => 199
 
 | Option                | Type            | Description                        |
 | --------------------- | --------------- | ---------------------------------- |
+| `mode`                | String          | Adaptive stealth mode ('auto')     |
 | `js_render`           | Boolean         | Enable JavaScript rendering        |
 | `premium_proxy`       | Boolean         | Use residential proxies            |
 | `proxy_country`       | String          | Country code (us, gb, de, etc.)    |
