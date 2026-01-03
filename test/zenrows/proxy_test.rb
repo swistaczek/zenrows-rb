@@ -150,4 +150,54 @@ class ProxyTest < Minitest::Test
       @proxy.build(session_ttl: "invalid")
     end
   end
+
+  def test_build_with_mode_auto
+    config = @proxy.build(mode: "auto")
+
+    assert_includes config[:password], "mode=auto"
+  end
+
+  def test_mode_auto_does_not_include_js_render_or_premium_proxy
+    config = @proxy.build(mode: "auto")
+
+    refute_includes config[:password], "js_render"
+    refute_includes config[:password], "premium_proxy"
+  end
+
+  def test_mode_auto_with_other_options
+    config = @proxy.build(mode: "auto", session_id: 123, wait_for: ".content")
+
+    assert_includes config[:password], "mode=auto"
+    assert_includes config[:password], "session_id=123"
+    assert_includes config[:password], "wait_for=.content"
+    refute_includes config[:password], "js_render"
+  end
+
+  def test_mode_auto_warns_when_js_render_set
+    _out, err = capture_io do
+      config = @proxy.build(mode: "auto", js_render: true)
+
+      assert_includes config[:password], "mode=auto"
+      refute_includes config[:password], "js_render"
+    end
+
+    assert_match(/js_render is ignored/, err)
+  end
+
+  def test_mode_auto_warns_when_premium_proxy_set
+    _out, err = capture_io do
+      config = @proxy.build(mode: "auto", premium_proxy: true)
+
+      assert_includes config[:password], "mode=auto"
+      refute_includes config[:password], "premium_proxy"
+    end
+
+    assert_match(/premium_proxy is ignored/, err)
+  end
+
+  def test_raises_on_invalid_mode
+    assert_raises ArgumentError do
+      @proxy.build(mode: "invalid")
+    end
+  end
 end

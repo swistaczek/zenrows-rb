@@ -25,6 +25,9 @@ module Zenrows
     # Valid sticky TTL values for HTTP proxy
     VALID_STICKY_TTL = %w[30s 5m 30m 1h 1d].freeze
 
+    # Valid mode values for adaptive stealth mode
+    VALID_MODES = %w[auto].freeze
+
     # Valid region codes for HTTP proxy
     VALID_REGIONS = {
       "africa" => "af",
@@ -82,6 +85,7 @@ module Zenrows
     # @option options [String] :device Device emulation ('mobile' or 'desktop')
     # @option options [Boolean] :antibot Enhanced antibot bypass mode
     # @option options [String] :session_ttl Session duration ('30s', '5m', '30m', '1h', '1d')
+    # @option options [String] :mode Adaptive stealth mode ('auto')
     # @return [Hash] Proxy configuration with :host, :port, :username, :password
     # @raise [WaitTimeError] if wait time exceeds 3 minutes
     # @raise [ArgumentError] if session_ttl is invalid
@@ -125,14 +129,34 @@ module Zenrows
     def build_params(opts)
       params = {}
 
+      # Adaptive stealth mode handling
+      if opts[:mode]
+        mode = opts[:mode].to_s.downcase
+        unless VALID_MODES.include?(mode)
+          raise ArgumentError, "Invalid mode: #{mode}. Valid values: #{VALID_MODES.join(", ")}"
+        end
+
+        # mode=auto manages js_render and premium_proxy - warn if user tries to set them
+        if mode == "auto"
+          if opts[:js_render]
+            warn "[Zenrows] Warning: js_render is ignored when mode=auto (auto-managed)"
+          end
+          if opts[:premium_proxy]
+            warn "[Zenrows] Warning: premium_proxy is ignored when mode=auto (auto-managed)"
+          end
+        end
+
+        params[:mode] = mode
+      end
+
       # Custom headers must be enabled first if we'll use headers
       params[:custom_headers] = true if opts[:custom_headers]
 
-      # JavaScript rendering
-      params[:js_render] = true if opts[:js_render]
+      # JavaScript rendering (skip if mode=auto manages it)
+      params[:js_render] = true if opts[:js_render] && !params[:mode]
 
-      # Premium proxy
-      params[:premium_proxy] = true if opts[:premium_proxy]
+      # Premium proxy (skip if mode=auto manages it)
+      params[:premium_proxy] = true if opts[:premium_proxy] && !params[:mode]
 
       # Wait time handling
       if opts[:wait]
@@ -204,8 +228,8 @@ module Zenrows
         params[:session_ttl] = ttl
       end
 
-      # Auto-enable js_render if needed
-      params[:js_render] = true if requires_js_render?(params)
+      # Auto-enable js_render if needed (skip if mode=auto manages it)
+      params[:js_render] = true if requires_js_render?(params) && !params[:mode]
 
       params
     end

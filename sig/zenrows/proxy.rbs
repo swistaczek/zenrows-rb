@@ -1,6 +1,7 @@
 class Zenrows::Proxy
   MAX_WAIT_MS: Integer
   VALID_STICKY_TTL: Array[String]
+  VALID_MODES: Array[String]
   VALID_REGIONS: Hash[String, String]
 
   attr_reader api_key: String
